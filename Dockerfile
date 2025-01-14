@@ -20,11 +20,27 @@ RUN composer install \
 FROM php:8.2-fpm-alpine
 
 # Install system dependencies
-RUN apk add --no-cache \
+RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
     nginx \
     supervisor \
     mysql-client \
-    sqlite
+    sqlite \
+    bash \
+    curl \
+    zip \
+    unzip \
+    libpng-dev \
+    libxml2-dev \
+    oniguruma-dev \
+    autoconf \
+    g++ \
+    gcc \
+    make \
+    libc-dev \
+    dpkg \
+    dpkg-dev \
+    file \
+    re2c
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo pdo_mysql opcache
