@@ -1,5 +1,3 @@
-@props(['question', 'value' => null])
-
 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-4">
     <div class="mb-4">
         <label class="block text-lg font-medium text-gray-900">

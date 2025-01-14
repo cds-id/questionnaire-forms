@@ -4,39 +4,51 @@
         @if($questionnaire->description)
             <p class="mt-4 text-gray-600">{{ $questionnaire->description }}</p>
         @endif
+
+        <div class="mt-6 flex flex-col sm:flex-row sm:items-center gap-4">
+            <span class="text-sm text-gray-600 whitespace-nowrap">Step {{ $currentStep }} of {{ $totalSteps }}</span>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: {{ ($currentStep / $totalSteps) * 100 }}%"></div>
+            </div>
+        </div>
     </div>
 
-    <form method="POST" action="{{ route('questionnaire.submit', $questionnaire) }}">
+    @if($currentSection->title)
+        <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900">{{ $currentSection->title }}</h2>
+            @if($currentSection->description)
+                <p class="mt-2 text-gray-600">{{ $currentSection->description }}</p>
+            @endif
+        </div>
+    @endif
+
+    <form method="POST" action="{{ route('questionnaire.store', ['step' => $currentStep]) }}">
         @csrf
 
-        @foreach($questionnaire->sections as $section)
-            @if($section->title)
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6">
-                    <h2 class="text-xl font-semibold text-gray-900">{{ $section->title }}</h2>
-                    @if($section->description)
-                        <p class="mt-2 text-gray-600">{{ $section->description }}</p>
-                    @endif
-                </div>
+        @foreach($currentSection->questions as $question)
+            @if($question->type === 'radio')
+                <x-questionnaire.radio-group
+                    :question="$question"
+                    :value="old('answers.' . $question->id, session('questionnaire_answers.' . $question->id))"
+                />
+            @elseif($question->type === 'textarea')
+                <x-questionnaire.textarea
+                    :question="$question"
+                    :value="old('answers.' . $question->id, session('questionnaire_answers.' . $question->id))"
+                />
             @endif
-
-            @foreach($section->questions as $question)
-                @if($question->type === 'radio')
-                    <x-questionnaire.radio-group
-                        :question="$question"
-                        :value="old('answers.' . $question->id)"
-                    />
-                @elseif($question->type === 'textarea')
-                    <x-questionnaire.textarea
-                        :question="$question"
-                        :value="old('answers.' . $question->id)"
-                    />
-                @endif
-            @endforeach
         @endforeach
 
-        <div class="flex justify-end mt-6">
-            <x-primary-button>
-                {{ __('Submit') }}
+        <div class="flex justify-between mt-6">
+            @if($currentStep > 1)
+                <a href="{{ route('questionnaire.show', ['step' => $currentStep - 1]) }}"
+                   class="inline-flex items-center px-4 py-2 bg-gray-200 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-300 transition">
+                    Previous
+                </a>
+            @endif
+
+            <x-primary-button class="ml-auto">
+                {{ $currentStep === $totalSteps ? 'Submit' : 'Next' }}
             </x-primary-button>
         </div>
     </form>

@@ -17,6 +17,9 @@
 <body class="font-sans antialiased bg-gray-50">
     <div class="min-h-screen py-12">
         <main>
+            <div class="flex justify-center">
+                <img class="h-10 w-auto" src="/images/logo-long.png" />
+            </div>
             <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
                 {{ $slot }}
             </div>
