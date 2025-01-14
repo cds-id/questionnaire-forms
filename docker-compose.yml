@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: questioner-app
+    restart: unless-stopped
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      APP_ENV: local
+      APP_DEBUG: true
+      APP_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: questioner
+      DB_USERNAME: questioner
+      DB_PASSWORD: secret
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "0.0.0.0:80:80"
+    volumes:
+      - .:/var/www
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    networks:
+      - questioner-network
+
+  mysql:
+    image: mysql:8.0
+    container_name: questioner-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: questioner
+      MYSQL_USER: questioner
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - questioner-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:alpine
+    container_name: questioner-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - questioner-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  questioner-network:
+    driver: bridge
