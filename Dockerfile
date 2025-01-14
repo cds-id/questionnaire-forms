@@ -20,7 +20,7 @@ RUN composer install \
 FROM php:8.2-fpm-alpine
 
 # Install system dependencies
-RUN apk add --no-cache --repository=http://dl-cdn.alpinelinux.org/alpine/edge/main \
+RUN apk add --no-cache \
     nginx \
     supervisor \
     mysql-client \
