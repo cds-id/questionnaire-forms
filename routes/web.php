@@ -21,6 +21,7 @@ Route::prefix('admin')->group(function () {
     Route::post('/login', [AdminController::class, 'authenticate'])->name('admin.authenticate');
     Route::post('/logout', [AdminController::class, 'logout'])->name('admin.logout');
     Route::get('/responses', [AdminController::class, 'responses'])->name('admin.responses');
+    Route::get('/responses/export', [AdminController::class, 'exportExcel'])->name('admin.responses.export');
     Route::delete('/responses/{response}', [AdminController::class, 'destroy'])->name('admin.responses.destroy');
 });
 

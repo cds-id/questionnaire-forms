@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Response;
 use Illuminate\Http\Request;
+use App\Exports\ResponsesExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class AdminController extends Controller
 {
@@ -36,6 +38,15 @@ class AdminController extends Controller
             ->get();
 
         return view('admin.responses', compact('responses'));
+    }
+
+    public function exportExcel()
+    {
+        if (!session('is_admin')) {
+            return redirect()->route('admin.login');
+        }
+
+        return Excel::download(new ResponsesExport, 'responses.xlsx');
     }
 
     public function destroy(Response $response)
